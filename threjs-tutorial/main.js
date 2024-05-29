@@ -5,7 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import * as dat from 'dat.gui'
 
 import nebula from './src/images/nebula.jpg'
-import stars from './public/stars.jpg'
+import stars from '/stars.jpg'
 
 //1
 const renderer = new THREE.WebGLRenderer();
@@ -109,8 +109,16 @@ scene.fog = new THREE.FogExp2(0xFFFFFF, 0.01)
 // renderer.setClearColor(0xFFEA00)
 
 const textureLoader = new THREE.TextureLoader();
-scene.background = textureLoader.load(stars);
-//const cubeTextureLoader = new THREE.CubeTextureLoader();
+//scene.background = textureLoader.load(stars);
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+scene.background = cubeTextureLoader.load([
+  stars,
+  stars,
+  stars,
+  stars,
+  stars,
+  stars
+]);
 
 const gui = new dat.GUI()
 
