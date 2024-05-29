@@ -121,11 +121,21 @@ scene.background = cubeTextureLoader.load([
 ]);
 
 const box2Geometry = new THREE.BoxGeometry(4, 4, 4);
-const box2Material = new THREE.MeshBasicMaterial({
-  //color: 0x00FF00,
-  map: textureLoader.load(nebula)
-});
-const box2 = new THREE.Mesh(box2Geometry, box2Material);
+// const box2Material = new THREE.MeshBasicMaterial({
+//   //color: 0x00FF00,
+//   map: textureLoader.load(nebula)
+// });
+
+const box2MultiMaterial = [
+  new THREE.MeshBasicMaterial({ map: textureLoader.load(stars)}),
+  new THREE.MeshBasicMaterial({ map: textureLoader.load(stars) }),
+  new THREE.MeshBasicMaterial({ map: textureLoader.load(nebula) }),
+  new THREE.MeshBasicMaterial({ map: textureLoader.load(nebula) }),
+  new THREE.MeshBasicMaterial({ map: textureLoader.load(stars) }),
+  new THREE.MeshBasicMaterial({ map: textureLoader.load(stars)}),
+]
+const box2 = new THREE.Mesh(box2Geometry, box2MultiMaterial);
+
 scene.add(box2);
 box2.position.set(0, 15, 10);
 
@@ -155,13 +165,24 @@ gui.add(options, 'penumbra', 0, 1);
 gui.add(options, 'intensity', 0, 1000);
 
 let step = 0;
-let speed = 0.01;
+
+const mousePosition = new THREE.Vector2();
+
+window.addEventListener('mousemove', function (e) {
+  mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mousePosition.y = - (e.clientY / window.innerHeight) * 2 + 1;
+});
+
+const rayCaster = new THREE.Raycaster();
+
+const sphereId = sphere.id;
+box2.name = 'theBox';
+
 
 //6
 // Clock animation
 function animate(time) {
-  box.rotation.x = time / 10000;
-  box.rotation.y = time / 10000;
+  
 
   step += options.speed;
   sphere.position.y = 10 * Math.abs(Math.sin(step));
@@ -170,6 +191,20 @@ function animate(time) {
   spotLight.penumbra = options.penumbra;
   spotLight.intensity = options.intensity;
   sLightHelper.update();
+
+  rayCaster.setFromCamera(mousePosition, camera);
+  const intersects = rayCaster.intersectObjects(scene.children); 
+  console.log(intersects);
+
+  for (let i = 0; i < intersects.length; i++) {
+    if (intersects[i].object.id === sphereId)
+      intersects[i].object.material.color.set(0xFF0000);
+    
+    if (intersects[i].object.name === 'theBox') {
+      intersects[i].object.rotation.x = time / 10000;
+      intersects[i].object.rotation.y = time / 10000;
+    }
+  }
 
   //4
   renderer.render(scene, camera);
