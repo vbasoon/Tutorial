@@ -139,15 +139,59 @@ const box2 = new THREE.Mesh(box2Geometry, box2MultiMaterial);
 scene.add(box2);
 box2.position.set(0, 15, 10);
 
+const plane2Geometry = new THREE.PlaneGeometry(10, 10, 10, 10);
+const plane2Material = new THREE.MeshBasicMaterial({
+  color: 0xFFFFFF,
+  wireframe: true
+})
+
+//Advansed Geometry
+
+const plane2 = new THREE.Mesh(plane2Geometry, plane2Material);
+scene.add(plane2);
+plane2.position.set(10, 10, 15);
+
+plane2.geometry.attributes.position.array[0] -= 10 * Math.random();
+plane2.geometry.attributes.position.array[1] -= 10 * Math.random();
+plane2.geometry.attributes.position.array[2] -= 10 * Math.random();
+const lastPointZ = plane2.geometry.attributes.position.array.length - 1;
+plane2.geometry.attributes.position.array[lastPointZ] -= 10 * Math.random();
+
+const sphere2Geometry = new THREE.SphereGeometry(4);
+
+// const vShader = `
+//   void main() {
+//     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+//   }
+// `;
+
+// const fShader = `
+//   void main() {
+//       gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0);
+//     }
+// `;
+
+const vShader = document.getElementById('vertexShader').textContent;
+const fShader = document.getElementById('fragmentShader').textContent;
+
+const sphere2Material = new THREE.ShaderMaterial({
+  vertexShader: vShader,
+  fragmentShader: fShader
+});
+
+const sphere2 = new THREE.Mesh(sphere2Geometry, sphere2Material);
+scene.add(sphere2);
+sphere2.position.set(-5, 10, 10);
+
 const gui = new dat.GUI()
 
 const options = {
   sphereColor: '#ffea00',
   wireframe: false,
   speed: 0.01,
-  angle: 0.2,
+  angle: 0.6,
   penumbra: 0,
-  intensity: 1,
+  intensity: 1000,
 };
 
 gui.addColor(options, 'sphereColor').onChange((e) => {
@@ -205,6 +249,12 @@ function animate(time) {
       intersects[i].object.rotation.y = time / 10000;
     }
   }
+
+  plane2.geometry.attributes.position.array[0] = 10 * Math.random();
+  plane2.geometry.attributes.position.array[1] = 10 * Math.random();
+  plane2.geometry.attributes.position.array[2] = 10 * Math.random();
+  plane2.geometry.attributes.position.array[lastPointZ] = 10 * Math.random();
+  plane2.geometry.attributes.position.needsUpdate = true;
 
   //4
   renderer.render(scene, camera);
